@@ -7,16 +7,10 @@ import matlab.unittest.plugins.TestReportPlugin
 jenkins_workspace = getenv('WORKSPACE');
 try
     % Pick up local tests
-    suite1 = testsuite();
-    suite2 = testsuite(fullfile(matlabroot, 'test', 'toolbox', 'stm', 'matlabunit', 'testdata', 'testfolder'));
-    suite3 = testsuite(fullfile(matlabroot, 'test', 'toolbox', 'stm', 'matlabunit', 'testdata', 'testfolder', 'iterations'));
-    suite4 = testsuite(fullfile(matlabroot, 'test', 'toolbox', 'stm', 'matlabunit', 'testdata', 'testfolder', 'tags'));
-    
-    suite = [suite1 suite2 suite3 suite4];
+    suite = testsuite();
     
     xmlResultsFile = fullfile(jenkins_workspace, 'JUnitResults.xml');
     tapResultsFile = fullfile(jenkins_workspace, 'TAPResults.tap');
-    %reportFile = fullfile(jenkins_workspace, 'TestReport.pdf');
     
     % Create and configure the runner
     runner = TestRunner.withTextOutput('Verbosity',3);
@@ -25,7 +19,6 @@ try
     runner.ArtifactsRootFolder = artifactsFolder;    
     runner.addPlugin(TAPPlugin.producingVersion13(ToFile(tapResultsFile)));
     runner.addPlugin(XMLPlugin.producingJUnitFormat(xmlResultsFile));
-    %runner.addPlugin(TestManagerReportPlugin(reportFile));
     
     % Add the MATLAB Unit TestReportPlugin
     % pdf
@@ -37,6 +30,7 @@ try
     runner.addPlugin(TestReportPlugin.producingHTML(htmlFolder,...
         'IncludingCommandWindowText', true,  'IncludingPassingDiagnostics', true));    
     results = runner.run(suite);
+    display(results);
 catch e
     disp(getReport(e, 'extended'));
     exit(1);
